@@ -1,4 +1,6 @@
 x64/
+*.o
+*.txt
 *.sln
 *.vcxproj
 *.filters
