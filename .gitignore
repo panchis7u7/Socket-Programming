@@ -1,4 +1,6 @@
 x64/
+*.bin
+*.run
 *.out
 *.exe
 *.deb
