@@ -1,4 +1,9 @@
 x64/
+*.out
+*.exe
+*.deb
+*.sh
+*.tar.gz
 *.o
 *.txt
 *.sln
