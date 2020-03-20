@@ -8,6 +8,9 @@
 #include <arpa/inet.h>
 #include <string.h>
 
+//Ejecute en Linux en el directorio en el que se encuentre, como: ./Server 9898
+//Nota Importante!, ejecute el servidor primero y despues el cliente!
+
 //argv -> port number
 //(domain)AF_INET -> IPV4, (Type)SOCC_STREAM -> TCP, SOCK_DGRAM ->UDP, 
 //(Protocolo) 0 -> default TCP
