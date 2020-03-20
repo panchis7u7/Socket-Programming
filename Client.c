@@ -10,73 +10,68 @@
 
 //(domain)AF_INET -> IPV4, (Type)SOCC_STREAM -> TCP, SOCK_DGRAM ->UDP, 
 //(Protocolo) 0 -> default TCP
+/* filename server_ip address portno
+ * argv[0] -> Nombre del archivo
+ * argv[1] -> Direccion IP del servidor
+ * argv[2] -> Numero del puerto
+ * */
 int main(int argc, char* argv[]){
+	
+	int sender_sock, port_number, n, i;
+	struct sockaddr_in server_address;
+	struct hostent* server; //Es usada para almacenar informacion a cerca de un host dado (hostname y direccion IPV4).
+	char buffer[255];
+	
+	
+	if(argc < 3) {
+		fprintf(stderr, "Uso del puerto de hostname %s\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+	
+	port_number = atoi(argv[2]);
+	
 	//Crear un socket 
-	int listening = socket(AF_INET, SOCK_STREAM, 0);
-	if(listening < 0){
-		perror("Error al crear Socket!");
+	if((sender_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("Error al abrir socket!");
 		exit(EXIT_FAILURE);
 	}
+	
+	if((server = gethostbyname(argv[1])) == NULL) {
+		fprintf(stderr, "Error!, no existe tal host!");
+		exit(EXIT_FAILURE);
+	}
+	
 	//Enlazar el socket a una IP / puerto
-	struct sockaddr_in hint;
-	hint.sin_family = AF_INET;
-	hint.sin_port = htons(54000);	//little endian en el puerto 54000
-	//pton -> AF_INET formato que se dara,  
-	inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr); //converts number to an array of integers
-	if(bind(listening, (struct sockaddr*) &hint, sizeof(hint)) < 0){
-		perror("No se pudo enlazar a la IP / Puerto!");
+	bzero((char*) &server_address, sizeof(server_address));
+	server_address.sin_family = AF_INET;
+	bcopy((char*) server->h_addr, (char*) &server_address.sin_addr.s_addr, server->h_length);
+	server_address.sin_port = htons(port_number);
+	if((connect(sender_sock, (struct sockaddr*) &server_address, sizeof(server_address))) < 0){
+		perror("Conexion fallida!");
 		exit(EXIT_FAILURE);
 	}
-	//Marcar el socket para escuchar (listening)
-	if(listen(listening, SOMAXCONN) < 0){
-		perror("No se puede escuchar!");
-		exit(EXIT_FAILURE);
-	}
-	//Acepta una llamada
-	struct sockaddr_in client;
-	struct socklen_t client_size = sizeof(client);
-	char host[NI_MAXHOST];
-	char svc[NI_MAXSERV];
 	
-	int client_socket = accept(listening, (struct sockaddr*)&client, &client_size);
-	if(client_socket < 0){
-		perror("Problema con el cliente!");
-		exit(EXIT_FAILURE);
-	}
-	//Cierra el socket que escucha
-	close(listening);
-	
-	memset(host, 0, NI_MAXHOST);
-	memset(svc, 0, NI_MAXSERV);
-	
-	int result = getnameinfo((struct sockaddr*) &client, sizeof(client), host, NI_MAXHOST, svc, NI_MAXSERV, 0);
-	if(result){
-		printf("%s conectado en %s\n", host, svc);
-	} else {
-		inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
-		printf("%s conectado en %d\n", host, ntohs(client.sin_port));
-	}
-	
-	//Minetras se recibe, despliega el mensaje
-	char buf[4096];
 	while(1){
-		//Limpia el buffer
-		memset(buf,0,4096);
-		//Espera el mensaje
-		int bytesRecv =recv(client_socket, buf, 4096, 0);
-		if(bytesRecv < 0){
-			perror("Hubo problemas en la conexion");
+		bzero(buffer, 255);
+		fgets(buffer, 255, stdin);
+		if((n = write(sender_sock, buffer, strlen(buffer))) < 0) {
+			perror("Problema al escribir los datos!");
 			exit(EXIT_FAILURE);
-		} else if (bytesRecv == 0) {
-			printf("El cliente se desconecto!\n");
-			break;
 		}
 		
-		 printf("Recibido: %s", );
-		//Despliega el mensaje
+		bzero(buffer, 255);
+		if((n = read(sender_sock, buffer, 255)) < 0) {
+			perror("Problema al leer los datos!");
+			exit(EXIT_FAILURE);
+		}
 		
-		//Reenvia en mensaje
+		printf("Server: %s\n", buffer);
+		
+		if((i = strncmp("Adios", buffer, 5)) == 0) {
+			break;
+		}
 	}
-	//Cierra el socket
+	close(sender_sock);
 	return 0;
+	//int bytesRecv =recv(client_socket, buf, 4096, 0);
 }

@@ -9,6 +9,8 @@
 #include <string.h>
 
 //argv -> port number
+//(domain)AF_INET -> IPV4, (Type)SOCC_STREAM -> TCP, SOCK_DGRAM ->UDP, 
+//(Protocolo) 0 -> default TCP
 int main(int argc, char* argv[]){
 	if(argc < 2){
 		fprintf(stderr, "Numero de puerto no proporcionado, Termino del programa!");
@@ -69,6 +71,7 @@ int main(int argc, char* argv[]){
 		printf("Client: %s\n", buffer);
 		bzero(buffer, 255);
 		fgets(buffer, 255, stdin);
+		
 		if((n = write(new_listening_sock, buffer, strlen(buffer))) < 0) {
 			perror("Problema al escribir los datos!");
 			exit(EXIT_FAILURE);
@@ -78,6 +81,8 @@ int main(int argc, char* argv[]){
 			break;
 		} 
 	}
+	close(new_listening_sock);
+	close(listening_sock);
 	//pton -> AF_INET formato que se dara,  
 	//inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr); //converts number to an array of integers
 	return 0;
