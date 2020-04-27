@@ -22,8 +22,28 @@ int main(int argc, char* argv[]){
 	
 	int sender_sock, port_number, n, i;
 	struct sockaddr_in server_address;
+	//struct sockaddr_in {
+    //short            sin_family;   // e.g. AF_INET
+    //unsigned short   sin_port;     // e.g. htons(3490)
+    //struct in_addr   sin_addr;     // see struct in_addr, below
+    //char             sin_zero[8];  // zero this if you want to
+	//};
+	
+	//struct in_addr {
+    //unsigned long s_addr;  // load with inet_aton()
+	//}; https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html
+	
 	struct hostent* server; //Es usada para almacenar informacion a cerca de un host dado (hostname y direccion IPV4).
 	char buffer[255];
+	//struct  hostent {
+     //char *  h_name;     
+     //char ** h_aliases; 
+     //int     h_addrtype;  
+     //int     h_length;    
+     //char ** h_addr_list;
+	//};
+
+	//#define h_addr  h_addr_list[0]
 	
 	
 	if(argc < 3) {
@@ -39,6 +59,9 @@ int main(int argc, char* argv[]){
 		exit(EXIT_FAILURE);
 	}
 	
+	 //The gethostbyname() function returns a structure of  type  hostent  for
+     //the given host name.  Here name is either a hostname or an IPv4 address
+     //in standard dot notation
 	if((server = gethostbyname(argv[1])) == NULL) {
 		fprintf(stderr, "Error!, no existe tal host!");
 		exit(EXIT_FAILURE);
