@@ -33,9 +33,9 @@ int main(int argc, char** argv){
 	printf("error para %s", argv[1]);
 
 	if(connect(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) < 0)
-	perror("error.");
+	perror("error al conectar.");
 	
-	sprintf(sendLine, "GET / HTTP/1.1\r\n\r\n");
+	sprintf(sendLine, "GET  HTTP/1.0\r\n\r\n");
 	bytesEnviados = strlen(sendLine);
 	
 	if(write(sockfd, sendLine, bytesEnviados) != bytesEnviados)
